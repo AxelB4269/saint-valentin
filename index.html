@@ -7,10 +7,6 @@
   <style>
     :root{
       --hot:#ff2e63;
-      --pink:#db282e;
-      --purple:#7c3aed;
-      --blue:#3b82f6;
-      --cyan:#22d3ee;
       --glass: rgba(255,255,255,.18);
       --stroke: rgba(255,255,255,.35);
       --shadow: 0 20px 60px rgba(0,0,0,.18);
@@ -26,7 +22,7 @@
       justify-content:center;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 
-      /* Dégradé plus “kitsch moderne” avec du bleu */
+      /* Dégradé rose/violet/bleu */
       background:
         radial-gradient(1000px 700px at 15% 20%, rgba(255,255,255,.85) 0%, transparent 55%),
         radial-gradient(900px 650px at 85% 10%, rgba(255,255,255,.75) 0%, transparent 50%),
@@ -37,7 +33,7 @@
       padding: 18px;
     }
 
-    /* petits coeurs flottants */
+    /* coeurs flottants */
     .heart {
       position: fixed;
       bottom: -40px;
@@ -119,30 +115,46 @@
       cursor: pointer;
       user-select:none;
       touch-action: manipulation;
-      transition: transform .18s ease, box-shadow .18s ease, left .12s ease, top .12s ease;
-      box-shadow: 0 14px 26px rgba(0,0,0,.15);
       min-width: 132px;
+      box-shadow: 0 14px 26px rgba(0,0,0,.15);
+
+      /* IMPORTANT: on garde toujours le centrage */
+      transform: translate(-50%, -50%) scale(var(--scale, 1));
+      transition: transform .18s ease, left .12s ease, top .12s ease;
       z-index: 2;
     }
-    .btn:active{ transform: scale(.98); }
+    .btn:active{
+      transform: translate(-50%, -50%) scale(calc(var(--scale, 1) * .98));
+    }
 
     #yesBtn{
       background: linear-gradient(135deg, #34d399, #22c55e);
       color: white;
+      left: 35%;
+      top: 55%;
+      --scale: 1;
     }
 
     #noBtn{
       background: rgba(255,255,255,.78);
       color: #111827;
       border: 1px solid rgba(255,255,255,.9);
+      left: 70%;
+      top: 55%;
+    }
+
+    /* Sur petits écrans on écarte encore un peu */
+    @media (max-width: 380px){
+      #yesBtn{ left: 32%; }
+      #noBtn { left: 72%; }
     }
 
     .wiggle{ animation: wiggle .25s ease; }
     @keyframes wiggle{
-      0%{ transform: scale(var(--scale,1)) rotate(0deg); }
-      35%{ transform: scale(var(--scale,1)) rotate(-4deg); }
-      70%{ transform: scale(var(--scale,1)) rotate(4deg); }
-      100%{ transform: scale(var(--scale,1)) rotate(0deg); }
+      0%{ transform: translate(-50%, -50%) scale(var(--scale,1)) rotate(0deg); }
+      35%{ transform: translate(-50%, -50%) scale(var(--scale,1)) rotate(-4deg); }
+      70%{ transform: translate(-50%, -50%) scale(var(--scale,1)) rotate(4deg); }
+      100%{ transform: translate(-50%, -50%) scale(var(--scale,1)) rotate(0deg); }
     }
 
     .footer{
@@ -154,7 +166,6 @@
       color:#6b7280;
     }
 
-    /* écran final */
     .overlay{
       position: fixed;
       inset:0;
@@ -177,25 +188,18 @@
       text-align:center;
       box-shadow: var(--shadow);
     }
-    .modal h2{
-      margin: 6px 0 6px;
-      font-size: 28px;
-      color:#111827;
-    }
-    .modal .big{
-      font-size: 40px;
-      filter: drop-shadow(0 8px 14px rgba(0,0,0,.12));
-    }
+    .modal h2{ margin: 6px 0; font-size: 28px; color:#111827; }
+    .modal .big{ font-size: 40px; filter: drop-shadow(0 8px 14px rgba(0,0,0,.12)); }
   </style>
 </head>
 <body>
 
   <div class="card">
     <div style="display:flex;justify-content:center;">
-      <div class="badge">💘 Margodouin 2026 Edition</div>
+      <div class="badge">💘 mode kitsch activé</div>
     </div>
 
-    <h1>Veux tu être <span class="pink">mon Valentin ?</span> ?</h1>
+    <h1>veux tu être <span class="pink">mon valentin</span> ?</h1>
     <p>Promis, c’est sans piège… enfin presque 😇</p>
 
     <div class="stage" id="stage">
@@ -224,53 +228,56 @@
     const noBtn  = document.getElementById("noBtn");
     const overlay = document.getElementById("overlay");
 
-    // Séparation propre au démarrage (positions en px dans l'encart)
-    function placeInitialButtons(){
-      const s = stage.getBoundingClientRect();
-      const y = Math.round(s.height * 0.55);
-
-      yesBtn.style.left = Math.round(s.width * 0.35) + "px";
-      yesBtn.style.top  = y + "px";
-
-      noBtn.style.left  = Math.round(s.width * 0.70) + "px";
-      noBtn.style.top   = y + "px";
-
-      // reset scale visuel
-      yesBtn.style.setProperty("--scale", "1");
-      yesBtn.style.transform = "scale(1)";
-      noBtn.style.transform = "scale(1)";
-    }
-
     let yesScale = 1;
     const noTexts = ["Non 🙄", "T’es sûr ? 😏", "Vraiment ? 🥺", "Re-réfléchis 😇", "Allez stp 😭", "Ok ok… NON ? 😈"];
     let noIndex = 0;
 
     function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
 
+    // Déplacement sur (presque) toute la zone, MAIS en gardant le centre du bouton dans le cadre
     function moveNoRandom() {
-      const s = stage.getBoundingClientRect();
-      const b = noBtn.getBoundingClientRect();
+      const w = stage.clientWidth;
+      const h = stage.clientHeight;
 
-      // Zone beaucoup plus large : quasi toute la surface
-      const margin = 6; // petit bord pour éviter de sortir
-      const maxX = s.width  - b.width  - margin*2;
-      const maxY = s.height - b.height - margin*2;
+      const bw = noBtn.offsetWidth;
+      const bh = noBtn.offsetHeight;
 
-      const x = margin + Math.random() * maxX;
-      const y = margin + Math.random() * maxY;
+      const margin = 8;
+
+      const minX = bw / 2 + margin;
+      const maxX = w - bw / 2 - margin;
+
+      const minY = bh / 2 + margin;
+      const maxY = h - bh / 2 - margin;
+
+      const x = minX + Math.random() * (maxX - minX);
+      const y = minY + Math.random() * (maxY - minY);
 
       noBtn.style.left = `${x}px`;
       noBtn.style.top  = `${y}px`;
+    }
+
+    // Petite correction: si au chargement ça se touche (selon fonts), on écarte un peu "Non"
+    function ensureSeparatedAtStart(){
+      const a = yesBtn.getBoundingClientRect();
+      const b = noBtn.getBoundingClientRect();
+
+      const overlap =
+        !(a.right < b.left || a.left > b.right || a.bottom < b.top || a.top > b.bottom);
+
+      if (overlap){
+        noBtn.style.left = "75%";
+      }
     }
 
     function dodge() {
       noIndex = (noIndex + 1) % noTexts.length;
       noBtn.textContent = noTexts[noIndex];
 
-      // Oui grossit légèrement
+      // IMPORTANT: on ne touche pas transform directement -> on modifie juste --scale
       yesScale *= 1.08;
       yesScale = clamp(yesScale, 1, 2.2);
-      yesBtn.style.transform = `scale(${yesScale})`;
+      yesBtn.style.setProperty("--scale", yesScale.toFixed(3));
 
       yesBtn.classList.remove("wiggle");
       void yesBtn.offsetWidth;
@@ -279,7 +286,7 @@
       moveNoRandom();
     }
 
-    // Mobile: fuite au touchstart
+    // Mobile: fuite au touchstart (avant le clic)
     noBtn.addEventListener("touchstart", (e) => {
       e.preventDefault();
       dodge();
@@ -302,7 +309,7 @@
 
     overlay.addEventListener("click", () => overlay.classList.remove("show"));
 
-    // Coeurs flottants en continu
+    // Coeurs flottants
     function spawnHeart() {
       const el = document.createElement("div");
       el.className = "heart";
@@ -345,14 +352,8 @@
       }
     }
 
-    // Initialisation + recalcul au resize/orientation
     window.addEventListener("load", () => {
-      placeInitialButtons();
-      // un petit délai pour être sûr des tailles après render
-      setTimeout(placeInitialButtons, 80);
-    });
-    window.addEventListener("resize", () => {
-      placeInitialButtons();
+      ensureSeparatedAtStart();
     });
   </script>
 </body>
