@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Valentin ?</title>
+  <style>
+    :root{
+      --pink:#ff4d8d;
+      --hot:#ff2e63;
+      --purple:#7c3aed;
+      --bg1:#ffdde1;
+      --bg2:#ee9ca7;
+      --glass: rgba(255,255,255,.18);
+      --stroke: rgba(255,255,255,.35);
+      --shadow: 0 20px 60px rgba(0,0,0,.18);
+    }
+
+    * { box-sizing: border-box; }
+
+    body{
+      margin:0;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1200px 800px at 20% 20%, #fff 0%, transparent 55%),
+                  radial-gradient(1200px 800px at 80% 0%, #fff 0%, transparent 45%),
+                  linear-gradient(135deg, var(--bg1), var(--bg2));
+      overflow:hidden;
+      color:#1f2937;
+      padding: 18px;
+    }
+
+    /* petits coeurs flottants */
+    .heart {
+      position: fixed;
+      bottom: -40px;
+      font-size: 18px;
+      opacity: .85;
+      animation: floatUp linear forwards;
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,.12));
+      pointer-events:none;
+      z-index: 0;
+    }
+    @keyframes floatUp{
+      to { transform: translateY(-120vh) translateX(var(--drift)); opacity: 0; }
+    }
+
+    .card{
+      width:min(520px, 100%);
+      border-radius: 28px;
+      padding: 26px 18px 22px;
+      background: var(--glass);
+      border: 1px solid var(--stroke);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      position: relative;
+      z-index: 2;
+    }
+
+    .badge{
+      display:inline-flex;
+      gap:10px;
+      align-items:center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.55);
+      border: 1px solid rgba(255,255,255,.65);
+      font-weight: 600;
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    h1{
+      margin: 14px 0 6px;
+      font-size: clamp(26px, 5.5vw, 38px);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      text-align:center;
+      color: #111827;
+    }
+    h1 .pink{
+      color: var(--hot);
+      text-shadow: 0 10px 22px rgba(255,46,99,.25);
+    }
+
+    p{
+      margin: 10px auto 0;
+      text-align:center;
+      color:#374151;
+      max-width: 38ch;
+      font-size: 15px;
+    }
+
+    .stage{
+      position: relative;
+      margin-top: 22px;
+      height: 180px;
+      border-radius: 20px;
+      background: rgba(255,255,255,.25);
+      border: 1px dashed rgba(255,255,255,.55);
+      overflow: hidden;
+    }
+
+    .btn{
+      position:absolute;
+      border:none;
+      border-radius: 999px;
+      padding: 14px 18px;
+      font-weight: 800;
+      font-size: 16px;
+      cursor: pointer;
+      user-select:none;
+      touch-action: manipulation;
+      transform: translate(-50%, -50%) scale(var(--scale, 1));
+      transition: transform .18s ease, box-shadow .18s ease;
+      box-shadow: 0 14px 26px rgba(0,0,0,.15);
+      min-width: 132px;
+    }
+    .btn:active{ transform: translate(-50%, -50%) scale(calc(var(--scale, 1) * .98)); }
+
+    #yesBtn{
+      left: 40%;
+      top: 55%;
+      background: linear-gradient(135deg, #34d399, #22c55e);
+      color: white;
+    }
+
+    #noBtn{
+      left: 65%;
+      top: 55%;
+      background: rgba(255,255,255,.75);
+      color: #111827;
+      border: 1px solid rgba(255,255,255,.9);
+    }
+
+    .wiggle{
+      animation: wiggle .25s ease;
+    }
+    @keyframes wiggle{
+      0%{ transform: translate(-50%, -50%) scale(var(--scale,1)) rotate(0deg); }
+      35%{ transform: translate(-50%, -50%) scale(var(--scale,1)) rotate(-4deg); }
+      70%{ transform: translate(-50%, -50%) scale(var(--scale,1)) rotate(4deg); }
+      100%{ transform: translate(-50%, -50%) scale(var(--scale,1)) rotate(0deg); }
+    }
+
+    .footer{
+      margin-top: 14px;
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      font-size: 12px;
+      color:#6b7280;
+    }
+
+    /* écran final */
+    .overlay{
+      position: fixed;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index: 5;
+      background: rgba(255, 240, 246, .55);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 18px;
+    }
+    .overlay.show{ display:flex; }
+    .modal{
+      width:min(520px, 100%);
+      background: rgba(255,255,255,.7);
+      border: 1px solid rgba(255,255,255,.85);
+      border-radius: 28px;
+      padding: 22px 18px;
+      text-align:center;
+      box-shadow: var(--shadow);
+    }
+    .modal h2{
+      margin: 6px 0 6px;
+      font-size: 28px;
+      color:#111827;
+    }
+    .modal .big{
+      font-size: 40px;
+      filter: drop-shadow(0 8px 14px rgba(0,0,0,.12));
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <div style="display:flex;justify-content:center;">
+      <div class="badge">💘 mode kitsch activé</div>
+    </div>
+
+    <h1>veux tu être <span class="pink">mon valentin</span> ?</h1>
+    <p>Promis, c’est sans piège… enfin presque 😇</p>
+
+    <div class="stage" id="stage">
+      <button class="btn" id="yesBtn" style="--scale:1;">Oui 💖</button>
+      <button class="btn" id="noBtn">Non 🙄</button>
+    </div>
+
+    <div class="footer">
+      <span>Astuce :</span>
+      <span>essaie d’attraper “Non” 😈</span>
+    </div>
+  </div>
+
+  <div class="overlay" id="overlay">
+    <div class="modal">
+      <div class="big">💞✨💞</div>
+      <h2>YESSSS !</h2>
+      <p>Ok c’est officiel : on est trop mignons 😭❤️</p>
+      <p style="margin-top:12px;font-size:12px;color:#6b7280;">(Tu peux fermer l’onglet maintenant et aller faire un câlin.)</p>
+    </div>
+  </div>
+
+  <script>
+    const stage = document.getElementById("stage");
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn  = document.getElementById("noBtn");
+    const overlay = document.getElementById("overlay");
+
+    let yesScale = 1;
+    const noTexts = ["Non 🙄", "T’es sûr ? 😏", "Vraiment ? 🥺", "Re-réfléchis 😇", "Allez stp 😭", "Ok ok… NON ? 😈"];
+    let noIndex = 0;
+
+    function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+
+    function moveNoRandom() {
+      const rect = stage.getBoundingClientRect();
+      const btnRect = noBtn.getBoundingClientRect();
+
+      // zone de déplacement en % (pratique sur mobile)
+      const padding = 18;
+      const maxX = rect.width - btnRect.width - padding;
+      const maxY = rect.height - btnRect.height - padding;
+
+      const x = padding + Math.random() * maxX;
+      const y = padding + Math.random() * maxY;
+
+      // position absolue dans la zone
+      noBtn.style.left = `${x}px`;
+      noBtn.style.top  = `${y}px`;
+      noBtn.style.transform = `translate(0,0) scale(1)`; // on passe en coordonnées absolues
+      noBtn.style.transition = "left .12s ease, top .12s ease, transform .12s ease";
+    }
+
+    // Replacer correctement le bouton au centre au chargement (mode translate(-50%,-50%))
+    function resetTransforms(){
+      // On remet le comportement initial (centré)
+      noBtn.style.transform = "translate(-50%, -50%) scale(1)";
+      noBtn.style.transition = "transform .18s ease, box-shadow .18s ease";
+      noBtn.style.left = "65%";
+      noBtn.style.top = "55%";
+    }
+
+    // Effet "Non" qui s'échappe (mobile friendly: touchstart)
+    function dodge() {
+      noIndex = (noIndex + 1) % noTexts.length;
+      noBtn.textContent = noTexts[noIndex];
+
+      // petite punition: Oui grossit légèrement
+      yesScale *= 1.08; // ~8% (plus doux que 10% en boucle sur mobile)
+      yesScale = clamp(yesScale, 1, 2.2);
+      yesBtn.style.setProperty("--scale", yesScale.toFixed(3));
+      yesBtn.classList.remove("wiggle");
+      void yesBtn.offsetWidth; // reflow pour relancer l'anim
+      yesBtn.classList.add("wiggle");
+
+      // déplacement
+      moveNoRandom();
+    }
+
+    // Sur mobile: le bouton "Non" fuit avant le clic
+    noBtn.addEventListener("touchstart", (e) => {
+      e.preventDefault(); // évite le "clic fantôme"
+      dodge();
+    }, { passive: false });
+
+    // Sur desktop: au survol il fuit aussi
+    noBtn.addEventListener("mouseenter", dodge);
+
+    // Si jamais quelqu'un arrive à cliquer: il fuit quand même
+    noBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      dodge();
+    });
+
+    // "Oui" déclenche la célébration
+    yesBtn.addEventListener("click", () => {
+      overlay.classList.add("show");
+      burstConfetti(110);
+      for(let i=0;i<18;i++) spawnHeart();
+    });
+
+    overlay.addEventListener("click", () => overlay.classList.remove("show"));
+
+    // Coeurs flottants en continu
+    function spawnHeart() {
+      const el = document.createElement("div");
+      el.className = "heart";
+      const hearts = ["💖","💘","💝","💗","💕","💞","❤️","💟","💓","😍"];
+      el.textContent = hearts[Math.floor(Math.random()*hearts.length)];
+      el.style.left = Math.random()*100 + "vw";
+      el.style.setProperty("--drift", (Math.random()*120 - 60) + "px");
+      el.style.animationDuration = (4 + Math.random()*3) + "s";
+      el.style.fontSize = (16 + Math.random()*18) + "px";
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 8000);
+    }
+    setInterval(spawnHeart, 380);
+
+    // Confettis (simple, sans lib)
+    function burstConfetti(count=80){
+      for(let i=0;i<count;i++){
+        const p = document.createElement("div");
+        p.style.position = "fixed";
+        p.style.left = (50 + (Math.random()*20-10)) + "vw";
+        p.style.top  = (45 + (Math.random()*10-5)) + "vh";
+        p.style.width = (6 + Math.random()*8) + "px";
+        p.style.height= (6 + Math.random()*10) + "px";
+        p.style.borderRadius = "4px";
+        p.style.background = `hsl(${Math.random()*360}, 90%, 65%)`;
+        p.style.zIndex = 6;
+        p.style.pointerEvents = "none";
+        const dx = (Math.random()*2-1) * 240;
+        const dy = (Math.random()*-1) * 420 - 120;
+        const rot = (Math.random()*2-1) * 720;
+        const dur = 900 + Math.random()*600;
+
+        p.animate([
+          { transform: "translate(0,0) rotate(0deg)", opacity: 1 },
+          { transform: `translate(${dx}px, ${dy}px) rotate(${rot}deg)`, opacity: 0 }
+        ], { duration: dur, easing: "cubic-bezier(.2,.8,.2,1)", fill: "forwards" });
+
+        document.body.appendChild(p);
+        setTimeout(()=>p.remove(), dur+50);
+      }
+    }
+
+    // au resize, on remet le "Non" à une position raisonnable
+    window.addEventListener("resize", resetTransforms);
+  </script>
+</body>
+</html>
