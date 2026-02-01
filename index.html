@@ -6,11 +6,11 @@
   <title>Valentin ?</title>
   <style>
     :root{
-      --pink:#db282e;
       --hot:#ff2e63;
+      --pink:#ff4d8d;
       --purple:#7c3aed;
-      --bg1:#ffdde1;
-      --bg2:#ee9ca7;
+      --blue:#3b82f6;
+      --cyan:#22d3ee;
       --glass: rgba(255,255,255,.18);
       --stroke: rgba(255,255,255,.35);
       --shadow: 0 20px 60px rgba(0,0,0,.18);
@@ -25,9 +25,13 @@
       align-items:center;
       justify-content:center;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: radial-gradient(1200px 800px at 20% 20%, #fff 0%, transparent 55%),
-                  radial-gradient(1200px 800px at 80% 0%, #fff 0%, transparent 45%),
-                  linear-gradient(135deg, var(--bg1), var(--bg2));
+
+      /* Dégradé plus “kitsch moderne” avec du bleu */
+      background:
+        radial-gradient(1000px 700px at 15% 20%, rgba(255,255,255,.85) 0%, transparent 55%),
+        radial-gradient(900px 650px at 85% 10%, rgba(255,255,255,.75) 0%, transparent 50%),
+        linear-gradient(135deg, #ffd1e8 0%, #bfa7ff 35%, #6aa9ff 70%, #7df0ff 100%);
+
       overflow:hidden;
       color:#1f2937;
       padding: 18px;
@@ -69,7 +73,7 @@
       border-radius: 999px;
       background: rgba(255,255,255,.55);
       border: 1px solid rgba(255,255,255,.65);
-      font-weight: 600;
+      font-weight: 700;
       font-size: 13px;
       color: #6b7280;
     }
@@ -98,7 +102,7 @@
     .stage{
       position: relative;
       margin-top: 22px;
-      height: 180px;
+      height: 190px;
       border-radius: 20px;
       background: rgba(255,255,255,.25);
       border: 1px dashed rgba(255,255,255,.55);
@@ -110,41 +114,35 @@
       border:none;
       border-radius: 999px;
       padding: 14px 18px;
-      font-weight: 800;
+      font-weight: 900;
       font-size: 16px;
       cursor: pointer;
       user-select:none;
       touch-action: manipulation;
-      transform: translate(-50%, -50%) scale(var(--scale, 1));
-      transition: transform .18s ease, box-shadow .18s ease;
+      transition: transform .18s ease, box-shadow .18s ease, left .12s ease, top .12s ease;
       box-shadow: 0 14px 26px rgba(0,0,0,.15);
       min-width: 132px;
+      z-index: 2;
     }
-    .btn:active{ transform: translate(-50%, -50%) scale(calc(var(--scale, 1) * .98)); }
+    .btn:active{ transform: scale(.98); }
 
     #yesBtn{
-      left: 40%;
-      top: 55%;
       background: linear-gradient(135deg, #34d399, #22c55e);
       color: white;
     }
 
     #noBtn{
-      left: 65%;
-      top: 55%;
-      background: rgba(255,255,255,.75);
+      background: rgba(255,255,255,.78);
       color: #111827;
       border: 1px solid rgba(255,255,255,.9);
     }
 
-    .wiggle{
-      animation: wiggle .25s ease;
-    }
+    .wiggle{ animation: wiggle .25s ease; }
     @keyframes wiggle{
-      0%{ transform: translate(-50%, -50%) scale(var(--scale,1)) rotate(0deg); }
-      35%{ transform: translate(-50%, -50%) scale(var(--scale,1)) rotate(-4deg); }
-      70%{ transform: translate(-50%, -50%) scale(var(--scale,1)) rotate(4deg); }
-      100%{ transform: translate(-50%, -50%) scale(var(--scale,1)) rotate(0deg); }
+      0%{ transform: scale(var(--scale,1)) rotate(0deg); }
+      35%{ transform: scale(var(--scale,1)) rotate(-4deg); }
+      70%{ transform: scale(var(--scale,1)) rotate(4deg); }
+      100%{ transform: scale(var(--scale,1)) rotate(0deg); }
     }
 
     .footer{
@@ -164,7 +162,7 @@
       align-items:center;
       justify-content:center;
       z-index: 5;
-      background: rgba(255, 240, 246, .55);
+      background: rgba(240, 248, 255, .45);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       padding: 18px;
@@ -194,14 +192,14 @@
 
   <div class="card">
     <div style="display:flex;justify-content:center;">
-      <div class="badge">💘 Margodouin 2026 Edition</div>
+      <div class="badge">💘 mode kitsch activé</div>
     </div>
 
-    <h1>Veux tu être <span class="pink">mon Valentin ?</span> ?</h1>
+    <h1>veux tu être <span class="pink">mon valentin</span> ?</h1>
     <p>Promis, c’est sans piège… enfin presque 😇</p>
 
     <div class="stage" id="stage">
-      <button class="btn" id="yesBtn" style="--scale:1;">Oui 💖</button>
+      <button class="btn" id="yesBtn">Oui 💖</button>
       <button class="btn" id="noBtn">Non 🙄</button>
     </div>
 
@@ -226,6 +224,23 @@
     const noBtn  = document.getElementById("noBtn");
     const overlay = document.getElementById("overlay");
 
+    // Séparation propre au démarrage (positions en px dans l'encart)
+    function placeInitialButtons(){
+      const s = stage.getBoundingClientRect();
+      const y = Math.round(s.height * 0.55);
+
+      yesBtn.style.left = Math.round(s.width * 0.35) + "px";
+      yesBtn.style.top  = y + "px";
+
+      noBtn.style.left  = Math.round(s.width * 0.70) + "px";
+      noBtn.style.top   = y + "px";
+
+      // reset scale visuel
+      yesBtn.style.setProperty("--scale", "1");
+      yesBtn.style.transform = "scale(1)";
+      noBtn.style.transform = "scale(1)";
+    }
+
     let yesScale = 1;
     const noTexts = ["Non 🙄", "T’es sûr ? 😏", "Vraiment ? 🥺", "Re-réfléchis 😇", "Allez stp 😭", "Ok ok… NON ? 😈"];
     let noIndex = 0;
@@ -233,66 +248,52 @@
     function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
 
     function moveNoRandom() {
-      const rect = stage.getBoundingClientRect();
-      const btnRect = noBtn.getBoundingClientRect();
+      const s = stage.getBoundingClientRect();
+      const b = noBtn.getBoundingClientRect();
 
-      // zone de déplacement en % (pratique sur mobile)
-      const padding = 18;
-      const maxX = rect.width - btnRect.width - padding;
-      const maxY = rect.height - btnRect.height - padding;
+      // Zone beaucoup plus large : quasi toute la surface
+      const margin = 6; // petit bord pour éviter de sortir
+      const maxX = s.width  - b.width  - margin*2;
+      const maxY = s.height - b.height - margin*2;
 
-      const x = padding + Math.random() * maxX;
-      const y = padding + Math.random() * maxY;
+      const x = margin + Math.random() * maxX;
+      const y = margin + Math.random() * maxY;
 
-      // position absolue dans la zone
       noBtn.style.left = `${x}px`;
       noBtn.style.top  = `${y}px`;
-      noBtn.style.transform = `translate(0,0) scale(1)`; // on passe en coordonnées absolues
-      noBtn.style.transition = "left .12s ease, top .12s ease, transform .12s ease";
     }
 
-    // Replacer correctement le bouton au centre au chargement (mode translate(-50%,-50%))
-    function resetTransforms(){
-      // On remet le comportement initial (centré)
-      noBtn.style.transform = "translate(-50%, -50%) scale(1)";
-      noBtn.style.transition = "transform .18s ease, box-shadow .18s ease";
-      noBtn.style.left = "65%";
-      noBtn.style.top = "55%";
-    }
-
-    // Effet "Non" qui s'échappe (mobile friendly: touchstart)
     function dodge() {
       noIndex = (noIndex + 1) % noTexts.length;
       noBtn.textContent = noTexts[noIndex];
 
-      // petite punition: Oui grossit légèrement
-      yesScale *= 1.1; // ~8% (plus doux que 10% en boucle sur mobile)
+      // Oui grossit légèrement
+      yesScale *= 1.08;
       yesScale = clamp(yesScale, 1, 2.2);
-      yesBtn.style.setProperty("--scale", yesScale.toFixed(3));
+      yesBtn.style.transform = `scale(${yesScale})`;
+
       yesBtn.classList.remove("wiggle");
-      void yesBtn.offsetWidth; // reflow pour relancer l'anim
+      void yesBtn.offsetWidth;
       yesBtn.classList.add("wiggle");
 
-      // déplacement
       moveNoRandom();
     }
 
-    // Sur mobile: le bouton "Non" fuit avant le clic
+    // Mobile: fuite au touchstart
     noBtn.addEventListener("touchstart", (e) => {
-      e.preventDefault(); // évite le "clic fantôme"
+      e.preventDefault();
       dodge();
     }, { passive: false });
 
-    // Sur desktop: au survol il fuit aussi
+    // Desktop: fuite au survol
     noBtn.addEventListener("mouseenter", dodge);
 
-    // Si jamais quelqu'un arrive à cliquer: il fuit quand même
+    // Si clic quand même
     noBtn.addEventListener("click", (e) => {
       e.preventDefault();
       dodge();
     });
 
-    // "Oui" déclenche la célébration
     yesBtn.addEventListener("click", () => {
       overlay.classList.add("show");
       burstConfetti(110);
@@ -308,15 +309,15 @@
       const hearts = ["💖","💘","💝","💗","💕","💞","❤️","💟","💓","😍"];
       el.textContent = hearts[Math.floor(Math.random()*hearts.length)];
       el.style.left = Math.random()*100 + "vw";
-      el.style.setProperty("--drift", (Math.random()*120 - 60) + "px");
+      el.style.setProperty("--drift", (Math.random()*140 - 70) + "px");
       el.style.animationDuration = (4 + Math.random()*3) + "s";
       el.style.fontSize = (16 + Math.random()*18) + "px";
       document.body.appendChild(el);
       setTimeout(() => el.remove(), 8000);
     }
-    setInterval(spawnHeart, 380);
+    setInterval(spawnHeart, 360);
 
-    // Confettis (simple, sans lib)
+    // Confettis
     function burstConfetti(count=80){
       for(let i=0;i<count;i++){
         const p = document.createElement("div");
@@ -329,10 +330,10 @@
         p.style.background = `hsl(${Math.random()*360}, 90%, 65%)`;
         p.style.zIndex = 6;
         p.style.pointerEvents = "none";
-        const dx = (Math.random()*2-1) * 240;
-        const dy = (Math.random()*-1) * 420 - 120;
-        const rot = (Math.random()*2-1) * 720;
-        const dur = 900 + Math.random()*600;
+        const dx = (Math.random()*2-1) * 260;
+        const dy = (Math.random()*-1) * 460 - 140;
+        const rot = (Math.random()*2-1) * 760;
+        const dur = 900 + Math.random()*650;
 
         p.animate([
           { transform: "translate(0,0) rotate(0deg)", opacity: 1 },
@@ -340,12 +341,19 @@
         ], { duration: dur, easing: "cubic-bezier(.2,.8,.2,1)", fill: "forwards" });
 
         document.body.appendChild(p);
-        setTimeout(()=>p.remove(), dur+50);
+        setTimeout(()=>p.remove(), dur+60);
       }
     }
 
-    // au resize, on remet le "Non" à une position raisonnable
-    window.addEventListener("resize", resetTransforms);
+    // Initialisation + recalcul au resize/orientation
+    window.addEventListener("load", () => {
+      placeInitialButtons();
+      // un petit délai pour être sûr des tailles après render
+      setTimeout(placeInitialButtons, 80);
+    });
+    window.addEventListener("resize", () => {
+      placeInitialButtons();
+    });
   </script>
 </body>
 </html>
