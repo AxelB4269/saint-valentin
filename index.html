@@ -6,7 +6,7 @@
   <title>Valentin ?</title>
   <style>
     :root{
-      --pink:#ff4d8d;
+      --pink:#db282e;
       --hot:#ff2e63;
       --purple:#7c3aed;
       --bg1:#ffdde1;
@@ -197,7 +197,7 @@
       <div class="badge">💘 Margodouin 2026 Edition</div>
     </div>
 
-    <h1>veux tu être <span class="red">mon valentin</span> ?</h1>
+    <h1>Veux tu être <span class="pink">mon Valentin ?</span> ?</h1>
     <p>Promis, c’est sans piège… enfin presque 😇</p>
 
     <div class="stage" id="stage">
@@ -266,7 +266,7 @@
       noBtn.textContent = noTexts[noIndex];
 
       // petite punition: Oui grossit légèrement
-      yesScale *= 1.08; // ~8% (plus doux que 10% en boucle sur mobile)
+      yesScale *= 1.1; // ~8% (plus doux que 10% en boucle sur mobile)
       yesScale = clamp(yesScale, 1, 2.2);
       yesBtn.style.setProperty("--scale", yesScale.toFixed(3));
       yesBtn.classList.remove("wiggle");
